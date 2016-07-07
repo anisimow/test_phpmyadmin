@@ -7,3 +7,12 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+    phpmyadmin.repository.generic:
+        abstract: true
+        class: PhpMyAdminBundle\Repository\GenericRepository
+        arguments: ['@doctrine.orm.entity_manager']
+
+    phpmyadmin.repository.tables:
+        parent: phpmyadmin.repository.generic
+        class: PhpMyAdminBundle\Repository\TablesRepository

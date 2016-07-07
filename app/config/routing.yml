@@ -1,3 +1,4 @@
-app:
-    resource: "@AppBundle/Controller/"
+homepage:
+    resource: "@PhpMyAdminBundle/Controller/"
     type:     annotation
+    prefix:   /

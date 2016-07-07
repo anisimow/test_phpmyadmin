@@ -2,12 +2,85 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        <title>{% block title %}Simple PhpMyAdmin{% endblock %}</title>
+
+        {% block stylesheets %}
+
+
+                {% stylesheets filter="scssphp" output="css/app.css"
+                    "%kernel.root_dir%/Resources/assets/scss/bootstrap.scss"
+                    "%kernel.root_dir%/Resources/assets/scss/font-awesome.scss"
+                    "%kernel.root_dir%/Resources/assets/css/*.css"
+                    "%kernel.root_dir%/Resources/assets/scss/main.scss"
+                %}
+                    <link rel="stylesheet" href="{{ asset_url }}" />
+                {% endstylesheets %}
+
+
+            {#<link rel="stylesheet" href="{{ asset('css/app.css') }}">#}
+        {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+
+    <body id="{% block body_id %}{% endblock %}">
+
+        {% block header %}
+            <header>
+                <div class="navbar navbar-default navbar-static-top" role="navigation">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" href="{{ path('homepage') }}">
+                                Simple phpMyAdmin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        {% endblock %}
+
+        <div class="container body-container">
+            {% block body %}
+                <div class="row">
+                    <div id="sidebar" class="col-sm-3">
+
+                        {% block sidebar %}{% endblock %}
+                    </div>
+
+                    <div id="main" class="col-sm-9">
+
+                        {{ include('default/_flash_messages.html.twig') }}
+
+                        {% block main %}{% endblock %}
+                    </div>
+                </div>
+            {% endblock %}
+        </div>
+
+        {% block footer %}
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div id="footer-copyright" class="col-md-12">
+                            <p>&copy; {{ 'now'|date('Y') }} - Simple phpMyAdmin</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        {% endblock %}
+
+        {% block javascripts %}
+
+            {% javascripts filter="?jsqueeze" output="js/app.js"
+                "%kernel.root_dir%/Resources/assets/js/jquery-2.1.4.js"
+                "%kernel.root_dir%/Resources/assets/js/moment.min.js"
+                "%kernel.root_dir%/Resources/assets/js/bootstrap-3.3.4.js"
+                "%kernel.root_dir%/Resources/assets/js/highlight.pack.js"
+                "%kernel.root_dir%/Resources/assets/js/bootstrap-datetimepicker.min.js"
+                "%kernel.root_dir%/Resources/assets/js/main.js" %}
+                <script src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+
+            {#<script src="{{ asset('js/app.js') }}"></script>#}
+        {% endblock %}
     </body>
 </html>

@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block body_id 'homepage' %}
+
+
+{% block sidebar %}
+
+    <div class="row">
+        <div class="span3">
+            <div class="well">
+                <ul class="nav nav-list">
+                    <li><label class="tree-toggle nav-header">Tables</label>
+                        <ul class="nav nav-list tree">
+
+                            {% for table in tables %}
+
+                                <li><label class="tree-toggle nav-header">{{ table.getName() }}</label>
+                                    <ul class="nav nav-list tree">
+                                        {% for column in table.getColumns() %}
+                                            <li>{{ column.getName() }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+
+                            {% else %}
+                                <li class="well">{{ 'tables.no_table_found'|trans }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="divider"></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>table name</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for table in tables %}
+            <tr>
+                <td>{{ table.getName() }}</td>
+
+                <td>
+                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                    <span class="glyphicon-class"><a href="{{ path('delete_table', { table_name: table.getName() }) }}" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></span>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="form_row">
+        {{ form_start(create_table_form, {'attr': {'class': 'form-inline'},'action': path('create_table'), 'method': 'POST' }) }}
+            <fieldset>
+                <legend>Создать новую таблицу</legend>
+                {{ form_widget(create_table_form) }}
+            </fieldset>
+        {{ form_end(create_table_form) }}
+    </div>
+{% endblock %}
