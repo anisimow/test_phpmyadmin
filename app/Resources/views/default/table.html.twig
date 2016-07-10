@@ -15,7 +15,7 @@
             {% for col_name, value in row %}
                 <th class="text-center">{{ col_name }}</th>
             {% endfor %}
-            <th>Действия</th>
+            <th class="col-md-2">Действия</th>
         </tr>
         {# table body #}
         {% for row in table_paginator %}
@@ -24,7 +24,7 @@
                     <td>{{ value }}</td>
                 {% endfor %}
                 <td>
-                    <a class="btn btn-sm btn-warning glyphicon glyphicon-pencil">Edit</a>
+                    <a href="{{ path('edit_raw', { table_name: table_name, id: row.id }) }}" class="btn btn-sm btn-warning glyphicon glyphicon-pencil">Edit</a>
                     <a href="{{ path('delete_raw', { table_name: table_name, id: row.id }) }}" class="btn btn-sm btn-danger glyphicon glyphicon-trash">Delete</a>
                 </td>
             </tr>

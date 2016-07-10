@@ -1,0 +1,16 @@
+{% extends 'default/homepage.html.twig' %}
+
+{% block body_id 'table' %}
+
+{% block main %}
+
+    <div class="form_row">
+        {{ form_start(edit_raw_form, {'attr': {'class': 'form'},'action': path('edit_raw', { table_name: table_name , id: raw_id}), 'method': 'POST' }) }}
+            <fieldset>
+                <legend>Изменить строку</legend>
+                {{ form_widget(edit_raw_form) }}
+            </fieldset>
+        {{ form_end(edit_raw_form) }}
+    </div>
+
+{% endblock %}

@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-class InsertRawType extends AbstractType
+class TableRawType extends AbstractType
 {
 
     public function configureOptions(OptionsResolver $resolver)
@@ -53,7 +53,7 @@ class InsertRawType extends AbstractType
         }
 
         $builder->add('submit', SubmitType::class, array(
-            'label' => 'Insert',
+            'label' => 'submit',
             'attr'  => array('class' => 'btn btn-default')
         ));
 

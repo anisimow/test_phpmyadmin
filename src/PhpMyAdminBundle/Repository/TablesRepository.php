@@ -88,6 +88,8 @@ class TablesRepository extends GenericRepository
 
     public function insertTableRow($table_name, array $values)
     {
+        $insert_values = $parameters = array();
+
         foreach ($values as $key => $val) {
             $parameters[':'.$key] = $val;
             $insert_values[$key] = ':'.$key;
@@ -100,6 +102,45 @@ class TablesRepository extends GenericRepository
             ->setParameters($parameters);
 
         return $query -> execute();
+    }
+
+    public function getRawById($table_name, $id)
+    {
+        $query = $this->getConnection()
+            ->createQueryBuilder()
+            ->select('*')
+            ->where('id=:id')
+            ->from($table_name)
+            ->setParameter(':id', $id);
+
+        return $query->execute()->fetch();
+    }
+
+    public function updateTableRow($table_name, $id, $values)
+    {
+        $insert_values = $parameters = array();
+
+        foreach ($values as $key => $val) {
+            $parameters[':'.$key] = $val;
+            $insert_values[$key] = ':'.$key;
+        }
+
+        $query = $this->getConnection()
+            ->createQueryBuilder()
+            ->update($table_name)
+            ->where('id=:id')
+            ->setParameters(
+                array_merge(
+                    $parameters,
+                    array(':id' => $id)
+                )
+            );
+
+        foreach($insert_values as $key => $value) {
+            $query ->set($key, $value);
+        }
+
+        return $query->execute();
     }
 
     /**

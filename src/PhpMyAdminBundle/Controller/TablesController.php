@@ -3,7 +3,7 @@
 namespace PhpMyAdminBundle\Controller;
 
 use PhpMyAdminBundle\Form\CreateTableType;
-use PhpMyAdminBundle\Form\InsertRawType;
+use PhpMyAdminBundle\Form\TableRawType;
 use PhpMyAdminBundle\Repository\TablesRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -79,11 +79,11 @@ class TablesController extends Controller
             array(
                 'table_name' => $table_name,
                 'tables' => $this->_getTables(),
-                'insert_raw_form' => $this->_getInsertForm($table_name)->createView(),
+                'insert_raw_form' => $this->_getRawForm($table_name)->createView(),
                 'table_paginator' => $this->_getTablesRepository()->getTablePaginator(
                     $table_name,
-                    $request->get('page', 1),
-                    $request->get('limit', 15)
+                    $request->get('page', $this->container->getParameter('knp_paginator.default_start')),
+                    $request->get('limit', $this->container->getParameter('knp_paginator.default_limit'))
                 )
             )
         );
@@ -112,22 +112,23 @@ class TablesController extends Controller
     }
 
     /**
-     * @Route("/insert_raw/{table_name}/", requirements={"table_name" = "\w+", }, name="insert_raw")
+     * @Route("/insert_raw/{table_name}/", requirements={"table_name"="\w+", "id"="'\d+"}, name="insert_raw")
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @internal param $table_name
      */
     public function insertRowAction(Request $request)
     {
-        $form = $this->_getInsertForm($request->get('table_name'));
+        $form = $this->_getRawForm($request->get('table_name'));
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (
-            $this->_getTablesRepository()->insertTableRow(
-                $request->get('table_name'),
-                $form->getData())
+                $this->_getTablesRepository()->insertTableRow(
+                    $request->get('table_name'),
+                    $form->getData()
+                )
             ) {
                 $this->addFlash('success', 'table.inserted_successfully');
             } else {
@@ -138,11 +139,82 @@ class TablesController extends Controller
         return $this->redirectToRoute('show_table', array('table_name' => $request->get('table_name')));
     }
 
+    /**
+     * @Route("/edit_raw/{table_name}/", requirements={"table_name" = "\w+", "id" = "'\d+"}, name="edit_raw")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @internal param $table_name
+     */
+    public function updateRowAction(Request $request)
+    {
+        $form = $this->_getRawForm($request->get('table_name'));
+
+        $form->handleRequest($request);
+
+        $table_name = $request->get('table_name');
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (
+                $this->_getTablesRepository()->updateTableRow(
+                    $table_name,
+                    $request->get('id'),
+                    $form->getData()
+                )
+            ) {
+                $this->addFlash('success', 'table.update_successfully');
+            } else {
+                $this->addFlash('danger', 'table.update_error');
+            }
+        } elseif (!$form->isSubmitted()){
+            $form->setData($this->_getTablesRepository()->getRawById($request->get('table_name'), $request->get('id')));
+
+            return $this->render(
+                'default/raw_edit.html.twig',
+                array(
+                    'table_name' => $table_name,
+                    'raw_id' => $request->get('id'),
+                    'tables' => $this->_getTables(),
+                    'edit_raw_form' => $form->createView(),
+                )
+            );
+        }
+
+        return $this->redirectToRoute('show_table', array('table_name' => $request->get('table_name')));
+    }
+
+    /**
+     * @Route("/alter_raw/{table_name}/{alter_action}", requirements={"table_name"="\w+", "alter_action"="\w+", "id"="\d+"}, name="alter_raw")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @internal param $table_name
+     */
+    public function alterRowAction(Request $request)
+    {
+        $form = $this->_getRawForm($request->get('table_name'));
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (
+            $this->_getTablesRepository()->alterTableRow(
+                $request->get('table_name'),
+                $request->get('id')
+            )
+            ) {
+                $this->addFlash('success', 'table.alter_successfully');
+            } else {
+                $this->addFlash('danger', 'table.alter_error');
+            }
+        }
+
+        return $this->redirectToRoute('show_table', array('table_name' => $request->get('table_name')));
+    }
 
     protected function _getTables()
     {
         return $this->_getTablesRepository()->getTables();
     }
+
 
     /**
      * @return TablesRepository
@@ -152,10 +224,10 @@ class TablesController extends Controller
         return $this->get('phpmyadmin.repository.tables');
     }
 
-    protected function _getInsertForm($table_name)
+    protected function _getRawForm($table_name)
     {
         return $this->createForm(
-            InsertRawType::class,
+            TableRawType::class,
             null,
             array('columns' => $this->_getTablesRepository()->getTableColumns($table_name))
         );

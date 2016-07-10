@@ -2,6 +2,8 @@
 # http://symfony.com/doc/current/book/service_container.html
 parameters:
 #    parameter_name: value
+    knp_paginator.default_start: 0
+    knp_paginator.default_limit: 10
 
 services:
 #    service_name:
