@@ -12,6 +12,8 @@ services:
         abstract: true
         class: PhpMyAdminBundle\Repository\GenericRepository
         arguments: ['@doctrine.orm.entity_manager']
+        calls:
+            - [setPaginator, ["@knp_paginator"]]
 
     phpmyadmin.repository.tables:
         parent: phpmyadmin.repository.generic

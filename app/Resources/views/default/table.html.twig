@@ -1,0 +1,47 @@
+{% extends 'default/homepage.html.twig' %}
+
+{% block body_id 'table' %}
+
+{% block main %}
+
+    {% set row = table_paginator|first %}
+
+    {# total items count #}
+    <div class="count text-left">
+        Общее количество записей: {{ table_paginator.getTotalItemCount }}
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            {% for col_name, value in row %}
+                <th class="text-center">{{ col_name }}</th>
+            {% endfor %}
+            <th>Действия</th>
+        </tr>
+        {# table body #}
+        {% for row in table_paginator %}
+            <tr>
+                {% for value in row %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+                <td>
+                    <a class="btn btn-sm btn-warning glyphicon glyphicon-pencil">Edit</a>
+                    <a href="{{ path('delete_raw', { table_name: table_name, id: row.id }) }}" class="btn btn-sm btn-danger glyphicon glyphicon-trash">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(table_paginator) }}
+    </div>
+
+    <div class="form_row">
+        {{ form_start(insert_raw_form, {'attr': {'class': 'form-horizontal'},'action': path('insert_raw', { table_name: table_name }), 'method': 'POST' }) }}
+            <fieldset>
+                <legend>Добавить строку</legend>
+                {{ form_widget(insert_raw_form) }}
+            </fieldset>
+        {{ form_end(insert_raw_form) }}
+    </div>
+
+{% endblock %}
